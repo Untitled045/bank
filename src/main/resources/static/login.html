@@ -1,0 +1,355 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<title>银行用户自助系统</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<script type="text/javascript" src="js/jquery-1.9.0.min.js"></script>
+<script type="text/javascript" src="js/login.js"></script>
+<link href="style/login2.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="js/layui/css/layui.css">
+    <script src="js/layui/layui.all.js"></script>
+    <script type="text/javascript" src="js/vue.js"></script>
+    <script type="text/javascript" src="js/axios.min.js"></script>
+</head>
+<body>
+<div id="container">
+<h1>银行用户自助系统</h1>
+
+<div class="login" style="margin-top:50px;">
+    
+    <div class="header">
+        <div class="switch" id="switch"><a class="switch_btn_focus" id="switch_qlogin" href="javascript:void(0);" tabindex="7">快速登录</a>
+			<a class="switch_btn" id="switch_login" href="javascript:void(0);" tabindex="8">快速注册</a><div class="switch_bottom" id="switch_bottom" style="position: absolute; width: 64px; left: 0px;"></div>
+        </div>
+    </div>    
+  
+    
+    <div class="web_qr_login" id="web_qr_login" style="display: block; height: 235px;">    
+
+            <!--登录-->
+            <div class="web_login" id="web_login">
+               
+               
+               <div class="login-box">
+    
+            
+			<div class="login_form">
+				<form action="/api/user/login" name="loginform" accept-charset="utf-8" id="login_form" class="loginForm" @submit.prevent="onSubmit2" method="post"><input type="hidden" name="did" value="0"/>
+               <input type="hidden" name="to" value="log"/>
+                <div class="uinArea" id="uinArea">
+                <label class="input-tips" for="u">卡号：</label>
+                <div class="inputOuter" id="uArea">
+                    
+                    <input v-model="card" required pattern="[0-9]{13}" placeholder="请输入13位卡号" type="text" id="u" name="card" class="inputstyle"/>
+                </div>
+                </div>
+                <div class="pwdArea" id="pwdArea">
+               <label class="input-tips" for="p">密码：</label>
+               <div class="inputOuter" id="pArea">
+                    
+                    <input v-model="password1" required  minlength="6" placeholder="请输入密码" type="password" id="p" name="password" class="inputstyle"/>
+                </div>
+                </div>
+               
+                <div style="text-align:center; margin-top:20px;">
+                    <input type="submit" style="margin-top:10px; margin-left: 70px;" value="登 录" style="width:150px;" class="button_blue"/>
+                </div>
+              </form>
+           </div>
+           
+            	</div>
+               
+            </div>
+            <!--登录end-->
+  </div>
+
+  <!--注册-->
+    <div class="qlogin" id="qlogin" style="display: none; ">
+   
+    <div class="web_login">
+        <form name="form2" id="regUser" accept-charset="utf-8" @submit.prevent="onSubmit"  action="/api/user" method="post">
+	      <input type="hidden" name="to" value="reg"/>
+		      		       <input type="hidden" name="did" value="0"/>
+        <ul class="reg_form" id="reg-ul">
+        		<div id="userCue" class="cue">快速注册请注意格式</div>
+                <li>
+                	
+                    <label for="user"  class="input-tips2">用户名：</label>
+                    <div class="inputOuter2">
+                        <input v-model="username" required type="text" id="user" name="username"  class="inputstyle2"/>
+                    </div>
+                    
+                </li>
+
+                <li>
+                <label for="passwd" class="input-tips2">密码：</label>
+                    <div class="inputOuter2">
+                        <input  v-model="password" type="password" id="passwd"  minlength="6" name="password" required class="inputstyle2"/>
+                    </div>
+                    
+                </li>
+
+                <li>
+                <label for="passwd2" class="input-tips2">确认密码：</label>
+                    <div class="inputOuter2">
+                        <input v-model="repassword" required minlength="6" type="password" id="passwd2"  class="inputstyle2" />
+                    </div>
+                    
+                </li>
+                
+                <li>
+                 <label for="sex" class="input-tips2">性别：</label>
+                    <div class="inputOuter2">
+                       
+                        <input v-model="gender" required type="text" id="sex" name="gender" maxlength="10" class="inputstyle2"/>
+                    </div>
+                   
+                </li>
+
+            <li>
+                <label for="number" class="input-tips2">电话：</label>
+                <div class="inputOuter2">
+
+                    <input v-model="tel" required pattern="1[3456789][0-9]{9}" type="text" id="number" name="tel" maxlength="11" class="inputstyle2"/>
+                </div>
+
+            </li>
+
+            <li>
+                <label for="ID" class="input-tips2">身份证号：</label>
+                <div class="inputOuter2">
+
+                    <input v-model="idcard" required pattern="(([0-9]{14})|([0-9]{17}))[0-9Xx]" type="text" id="ID" name="idcard" maxlength="18" class="inputstyle2"/>
+                </div>
+
+            </li>
+
+            <li>
+                <label for="address" class="input-tips2">联系地址：</label>
+                <div class="inputOuter2">
+
+                    <input v-model="address" required type="text" id="address" name="address"  class="inputstyle2"/>
+                </div>
+
+            </li>
+
+                <li>
+                    <div class="inputArea">
+                        <input type="submit" id="reg" style="margin-top:15px; margin-left: 80px;" class="button_blue" value="注 册"/>
+                    </div>
+                    
+                </li><div class="cl"></div>
+            </ul></form>
+           
+    
+    </div>
+   
+    
+    </div>
+    <!--注册end-->
+</div>
+</div>
+<script>
+    var that=this;
+    var example1 = new Vue({
+        el: '#container',
+        data: {
+            username: '',
+            password: '',
+            repassword:'',
+            gender: '',
+            tel: '',
+            idcard: '',
+            address: '',
+            accountnum: '',
+            tip:'',
+            card:'',
+            password1:''
+        },
+        methods: {
+            onSubmit() {
+                var that = this;
+                var passwd1 = this.password;
+                var passwd2 = this.repassword;
+                if((passwd1.trim()==='')||(passwd2.trim()==='')){
+                    example1.tip='新密码和确认密码不能为空!';
+                    var othis = $(this), method = "offset";
+                    active[method] ? active[method].call(this, othis) : '';
+                    return false;
+                }
+                else if(!(passwd1 === passwd2)){
+                    document.getElementById("passwd").style.color = "red";
+                    document.getElementById("passwd2").style.color = "red";
+                    example1.tip='两次输入的密码不一致!';
+                    var othis = $(this), method = "offset";
+                    active[method] ? active[method].call(this, othis) : '';
+                    return false;
+                }else{
+                    document.getElementById("passwd").style.color = "#666";
+                    document.getElementById("passwd2").style.color = "#666";
+                }
+                // var othis = $(that), method = "notice";
+                // active[method] ? active[method].call(that, othis) : '';
+                axios.post('/api/user', {
+                    username: that.username,
+                    password: that.password,
+                    gender: that.gender,
+                    tel: that.tel,
+                    idcard: that.idcard,
+                    address: that.address
+                })
+                    .then((response) => {
+                        console.log(response);
+                        if(response.data==='already'){
+
+                        }else{
+                            this.accountnum=response.data;
+                            var othis = $(that), method = "notice";
+                            active[method] ? active[method].call(that, othis) : '';
+                        }
+
+
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            },
+            onSubmit2() {
+
+                var that = this;
+
+                axios.post('/api/user/login', {
+                    card: that.card,
+                    password: that.password1
+                })
+                    .then((response) => {
+                        console.log(response);
+                        if(response.data==='success'){
+                            window.location.href="/";
+                        }else{
+                            that.tip=response.data;
+                            // alert(response.data)
+                            var othis = $(that), method = "offset";
+                            active[method] ? active[method].call(that, othis) : '';
+                        }
+
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            },
+//读取cookies
+            getCookie(name) {
+                var arr, reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
+
+                if (arr = document.cookie.match(reg))
+
+                    return unescape(arr[2]);
+                else
+                    return null;
+            },
+
+            //删除cookies
+            delCookie(name) {
+                var exp = new Date();
+                exp.setTime(exp.getTime() - 1);
+                var cval = this.getCookie(name);
+                if (cval != null)
+                    document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString();
+            }
+
+        },
+        mounted() {
+        }
+    });
+    var $ = layui.jquery, layer = layui.layer; //独立版的layer无需执行这一句
+
+    //触发事件
+    var active = {
+        offset(othis){
+            var type = othis.data('type');
+
+            layer.open({
+                type: 1
+                ,offset: type //具体配置参考：http://www.layui.com/doc/modules/layer.html#offset
+                ,id: 'layerDemo'+type //防止重复弹出
+                ,content: '<div style="padding: 20px 100px;">'+ example1.tip +'</div>'
+                ,btn: '确定'
+                ,btnAlign: 'c' //按钮居中
+                ,shade: 0 //不显示遮罩
+                ,yes: function(){
+                    layer.closeAll();
+                }
+            });
+        },
+        notice(){
+            //示范一个公告层
+            layer.open({
+                type: 1
+                ,
+                title: false //不显示标题栏
+                ,
+                closeBtn: false
+                ,
+                area: '300px;'
+                ,
+                shade: 0.8
+                ,
+                id: 'LAY_layuipro' //设定一个id，防止重复弹出
+                ,
+                btn: ['立即登录']
+                ,
+                btnAlign: 'c'
+                ,
+                moveType: 1 //拖拽模式，0或者1
+                ,
+                content: '<div style=\"padding: 30px;  line-height: 22px; background-color: #393D49; font-weight: 300;\"><span style="color: white; font-size: larger ">注册成功</span><br/><br/><div><span style="color: white; ">您注册的卡号为：</span><br><br><input style=\"width: 200px; color:red; text-indent: 0rem; height: 30px; padding-left: 10px; padding-right: 10px; margin-bottom: 20px;\" type=\"text\" value=\"' + example1.accountnum + '  \" disabled><p style=\"font-size: 10px; line-height: 16px; color: #93D1FF;\">注：请牢记您的卡号，本帐号用于登录本系统，请勿泄露给他人。</p></div></div>'
+                ,
+                success: function (layero) {
+
+                }
+            });
+        }
+
+    };
+
+
+    // //接收卡号
+    // var accountnum = 1234567890;
+    //
+    // layui.use('layer', function(){ //独立版的layer无需执行这一句
+    //     var $ = layui.jquery, layer = layui.layer; //独立版的layer无需执行这一句
+    //
+    //     //触发事件
+    //     var active = {
+    //        notice: function(){
+    //             //示范一个公告层
+    //             layer.open({
+    //                 type: 1
+    //                 ,title: false //不显示标题栏
+    //                 ,closeBtn: false
+    //                 ,area: '300px;'
+    //                 ,shade: 0.8
+    //                 ,id: 'LAY_layuipro' //设定一个id，防止重复弹出
+    //                 ,btn: ['立即登录']
+    //                 ,btnAlign: 'c'
+    //                 ,moveType: 1 //拖拽模式，0或者1
+    //                 ,content: '<div style=\"padding: 30px; line-height: 22px; background-color: #393D49; color: #fff; font-weight: 300;\"><h2>注册成功</h2><br><div>您注册的卡号为：<br><br><input style=\"width: 100px; height: 30px; padding-left: 10px; margin-bottom: 20px;\" type=\"text\" value=\"' + accountnum + '\" disabled><p style=\"font-size: 10px; line-height: 16px; color: #93D1FF;\">注：请保存好您的卡号，本帐号用于登录本系统，请勿泄露给他人。</p></div></div>'
+    //                 ,success: function(layero){
+    //
+    //                 }
+    //             });
+    //         }
+    //
+    //     };
+    //
+    //     $('#layerDemo .layui-btn').on('click', function(){
+    //         var othis = $(this), method = othis.data('method');
+    //         active[method] ? active[method].call(this, othis) : '';
+    //     });
+    //
+    // });
+</script>
+</body>
+
+</html>

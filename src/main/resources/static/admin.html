@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8" />
+<title>登录</title>
+<link rel="stylesheet" type="text/css" href="style/index.css" />
+	<script src="js/layui/layui.all.js"></script>
+	<link rel="stylesheet" href="js/layui/css/layui.css">
+	<script type="text/javascript" src="js/vue.js"></script>
+	<script type="text/javascript" src="js/axios.min.js"></script>
+
+</head>
+
+<body>
+<div id="container">
+<img class="bgone" src="images/1.jpg" />
+<img class="pic" src="images/a.png" />
+
+<div class="table">
+	<div class="wel">银行系统后台登录</div>
+	<div class="wel1">YIN HANG XI TONG HUO TAI DENG LU</div>
+	<form action="/api/user/login" method="post" @submit.prevent="onSubmit">
+	<div class="user">
+		<div id="yonghu" style=""><img src="images/yhm.png" /></div>
+		<input  required v-model="card" type="text" name="card" placeholder="请输入用户名" />
+	</div>			
+	<div class="password">
+		<div id="yonghu"><img src="images/mm.png" /></div>
+		<input required  v-model="password" type="password" name="password" placeholder="请输入密码"/>
+	</div>
+	<input class="btn" type="submit" name="登录" value="登录" />
+	</form>
+</div>
+</div>
+<script>
+
+	var example1 = new Vue({
+		el: '#container',
+		data: {
+			tip: '',
+			card:'',
+			password:''
+
+		},
+		methods: {
+			onSubmit() {
+				var that = this;
+
+				axios.post('/api/user/login', {
+					card: that.card,
+					password: that.password
+				})
+						.then((response) => {
+							console.log(response);
+							if(response.data==='admin_success'){
+								window.location.href="/index_admin.html";
+
+							}else{
+								that.tip=response.data;
+								// alert(response.data)
+								var othis = $(that), method = "offset";
+								active[method] ? active[method].call(that, othis) : '';
+							}
+
+						})
+						.catch(function (error) {
+							console.log(error);
+						});
+			},
+
+			setCookie(name, value) {
+				var Days = 30;
+				var exp = new Date();
+				exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);
+				document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString();
+			},
+//读取cookies
+			getCookie(name) {
+				var arr, reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
+
+				if (arr = document.cookie.match(reg))
+
+					return unescape(arr[2]);
+				else
+					return null;
+			},
+
+			//删除cookies
+			delCookie(name) {
+				var exp = new Date();
+				exp.setTime(exp.getTime() - 1);
+				var cval = this.getCookie(name);
+				if (cval != null)
+					document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString();
+			}
+
+		},
+		mounted() {
+			this.username1 = this.getCookie("username");
+		}
+	});
+
+	var $ = layui.jquery, layer = layui.layer; //独立版的layer无需执行这一句
+
+	//触发事件
+	var active = {
+		offset: function (othis) {
+			var type = othis.data('type');
+
+			layer.open({
+				type: 1
+				, offset: type //具体配置参考：http://www.layui.com/doc/modules/layer.html#offset
+				, id: 'layerDemo' + type //防止重复弹出
+				, content: '<div style="padding: 20px 100px;">' + example1.tip + '</div>'
+				, btn: '确定'
+				, btnAlign: 'c' //按钮居中
+				, shade: 0 //不显示遮罩
+				, yes: function () {
+					layer.closeAll();
+				}
+			});
+		}
+	};
+
+
+
+
+
+
+</script>
+</body>
+</html>

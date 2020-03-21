@@ -1,0 +1,134 @@
+﻿
+
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>首页</title>
+<link rel="stylesheet" type="text/css" href="css/reset.css" />
+<link rel="stylesheet" type="text/css" href="css/style.css" />
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/jquery.nicescroll.min.js"></script>
+<script type="text/javascript" src="js/index.js"></script>
+<script type="text/javascript" src="js/vue.js"></script>
+<script type="text/javascript" src="js/axios.min.js"></script>
+<body>
+<div id="container">
+<!--Top Start!-->
+<div id="top">
+    <div class="topBar">
+        <div class="inner clearfix">
+            <h4>用户首页</h4>
+            <div class="contact topItem">
+                <h3><a href="#">联系我们<i></i></a></h3>
+                <div class="dropdown">
+                    <a href="#">联系我们</a>
+                    <a href="#">联系我们</a>
+                    <a href="#">联系我们</a>
+                </div>
+            </div>
+            <div class="userBar topItem">
+                <h3><a href="#">{{username}}<i></i></a></h3>
+                <div class="dropdown">
+                    <a @click="logout()">退出</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Top End!-->
+
+<!--Menu Start!-->
+
+
+<!--Main Start!-->
+<div id="main">
+    <div class="content">
+        <div class="contBox">
+            <div class="contW">
+                <!--余额-->
+                <ul class="balanList clearfix">
+                    <li>
+                        <h2>账户余额（元）</h2>
+                        <p><span>{{amount}}</span></p>
+                        <div class="balanBottom"><a class="" href="">刷新余额</a></div>
+                    </li>
+                </ul>
+                <div class="moneyW">
+                    <h4>网站公告</h4>
+                    <p>{{notice}}</p>
+<!--                    <p>1、提现余额低于100元无法提现；</p>-->
+<!--                    <p>2、提现金额不能大于提现金额；</p>-->
+<!--                    <p>3、提现申请后，请耐心等待管理员审核；</p>-->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Main End!-->
+
+</div>
+<script>
+    var example1 = new Vue({
+        el: '#container',
+        data: {
+            amount: '12.00',
+            username:'',
+            notice:''
+        },
+        methods:{
+            logout(){
+                this.delCookie('card');
+                this.delCookie('username');
+                window.top.location="/api/user/logout";
+            },
+//读取cookies
+            getCookie(name){
+        var arr,reg=new RegExp("(^| )"+name+"=([^;]*)(;|$)");
+
+        if(arr=document.cookie.match(reg))
+
+            return unescape(arr[2]);
+        else
+            return null;
+    },
+
+    //删除cookies
+    delCookie(name)
+    {
+        var exp = new Date();
+        exp.setTime(exp.getTime() - 1);
+        var cval=this.getCookie(name);
+        if(cval!=null)
+            document.cookie= name + "="+cval+";expires="+exp.toGMTString();
+    }
+
+    },
+        mounted(){
+            var that=this;
+            axios.get('/api/account', {
+                params: {
+                    card: that.getCookie("card")
+                }
+            })
+                .then(function (response) {
+                    that.amount=response.data;
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+
+            axios.get('/api/notice', {
+                params: {}
+            })
+                .then(function (response) {
+                    that.notice=response.data;
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+            this.username=this.getCookie("username")
+        }
+
+    })
+</script>
+</body>
+

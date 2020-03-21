@@ -1,0 +1,288 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <title>19个人中心</title>
+    <link rel="stylesheet" type="text/css" href="css/reset.css"/>
+    <link rel="stylesheet" type="text/css" href="css/style.css"/>
+
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/jquery.nicescroll.min.js"></script>
+    <script type="text/javascript" src="js/index.js"></script>
+    <link rel="stylesheet" href="js/layui/css/layui.css">
+    <script src="js/layui/layui.js"></script>
+    <script type="text/javascript" src="js/vue.js"></script>
+    <script type="text/javascript" src="js/axios.min.js"></script>
+</head>
+</head>
+<body>
+<div id="container">
+    <!--Top Start!-->
+    <div id="top">
+        <div class="topBar">
+            <div class="inner clearfix">
+                <h4>个人中心</h4>
+                <div class="contact topItem">
+                    <h3><a href="#">联系我们<i></i></a></h3>
+                    <div class="dropdown">
+                        <a href="#">联系我们</a>
+                        <a href="#">联系我们</a>
+                        <a href="#">联系我们</a>
+                    </div>
+                </div>
+                <div class="userBar topItem">
+                    <h3><a href="#">{{username1}}<i></i></a></h3>
+                    <div class="dropdown">
+                        <a @click="logout()">退出</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--Top End!-->
+
+    <!--Main Start!-->
+    <div id="main">
+        <div class="content">
+            <div class="contBox bgf9">
+                <div class="personBox">
+                    <div class="personTit">
+                        <a class="active" href="19personal_baseInfomation.html" target="_self">基本信息</a>
+                        <a href="20personal_alterPassword.html" target="_self">密码修改</a>
+                    </div>
+
+                    <div class="personW">
+                        <table style="margin-top:30px;">
+                            <tr style="height: 50px;">
+                                <td>用户名：</td>
+
+                                <td v-show="isEditingName"id="usename" style="padding-left: 30px; color: #adadad;"><input id="pp1" v-model="user.username" type="text" ></td>
+                                <td v-show="!isEditingName" style="padding-left: 30px;">{{hiddenName}}</td>
+                                <td style="padding-left: 30px; color: #0081c1;"><p id="p1" onclick="alter1(this);">修改</p>
+                                </td>
+                            </tr>
+                            <tr style="height: 50px;">
+                                <td>手机号码：</td>
+
+                                <td v-show="isEditingTel" id="usenumber" style="padding-left: 30px;color: #adadad;"><input id="pp2" v-model="user.tel" type="text"  />
+                                <td v-show="!isEditingTel"  style="padding-left: 30px;">{{hiddenTel}}</td>
+                                </td>
+                                <td style="padding-left: 30px; color: #0081c1;"><p id="p2" onclick="alter2(this);">修改</p>
+                                </td>
+                            </tr>
+                            <tr style="height: 50px;">
+                                <td>性别：</td>
+                                <td id="usesex" style="padding-left: 30px;color: #adadad;">{{user.gender}}</td>
+                            </tr>
+                            <tr style="height: 50px;">
+                                <td>身份证号：</td>
+                                <td id="useid" style="padding-left: 30px;color: #adadad;">{{user.idcard}}</td>
+                            </tr>
+                            <tr style="height: 50px;">
+                                <td>住址：</td>
+                                <td id="useaddress" style="padding-left: 30px;color: #adadad;"><input id="pp3"
+                                                                                                      style="width: 500px;"
+                                                                                                      v-model="user.address"
+                                                                                                      type="text"
+                                                                                                      disabled>
+                                </td>
+                                <td style="padding-left: 30px; color: #0081c1;"><p id="p3" onclick="alter(this);">修改</p>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="site-demo-button" id="layerDemo" style="margin-bottom: 0;">
+                        <input data-type="auto" class="personSure" style="background-color: #9F9F9F;" id="sure"
+                               type="button" id="cz" value="保存"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--Main End!-->
+
+</div>
+
+<script>
+    var example1 = new Vue({
+        el: '#container',
+        data: {
+            username1: '',
+            // tel:'',
+            // address:'',
+            user: {},
+            tip: '',
+            isEditingTel:false,
+            isEditingName:false
+        },
+                        //
+
+                        //
+        computed: {
+            hiddenName: {
+                get: function () {
+                    if(this.user.username){
+                        return this.user.username.substring(0, 1) + this.repeat('*',this.user.username.length-1)
+                    }
+                   return '';
+                }
+                // ,
+                // set: function (value) {
+                //
+                // }
+            },
+            hiddenTel: {
+                get: function () {
+                    if(this.user.tel){
+                        return '***' + this.user.tel.substring(3, 7) + '****';
+                    }
+                    return '';
+
+                }
+                // ,
+                // set: function (value) {
+                //
+                // }
+            }
+        },
+
+        methods: {
+            repeat: (str, n) => new Array(n + 1).join(str),
+            logout() {
+                this.delCookie('card');
+                this.delCookie('username');
+                window.top.location = "/api/user/logout";
+            },
+            setCookie(name, value) {
+                var Days = 30;
+                var exp = new Date();
+                exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);
+                document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString();
+            },
+//读取cookies
+            getCookie(name) {
+                var arr, reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
+
+                if (arr = document.cookie.match(reg))
+
+                    return unescape(arr[2]);
+                else
+                    return null;
+            },
+
+            //删除cookies
+            delCookie(name) {
+                var exp = new Date();
+                exp.setTime(exp.getTime() - 1);
+                var cval = this.getCookie(name);
+                if (cval != null)
+                    document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString();
+            }
+
+        },
+        mounted() {
+            this.username1 = this.getCookie("username");
+            axios.get('/api/user', {
+                params: {
+                    card: this.getCookie("card")
+                }
+            })
+                .then((response) => {
+                    console.log(response.data);
+                    this.user = response.data;
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        }
+    });
+
+    function alter(obj) {
+        var idd = "p" + obj.id;
+        document.getElementById(idd).removeAttribute("disabled");
+        document.getElementById(idd).focus();
+        document.getElementById("sure").style.backgroundColor = "#12be16";
+    }
+    function alter1() {
+        //姓名
+        example1.isEditingName=true;
+        document.getElementById('pp1').focus();
+        document.getElementById("sure").style.backgroundColor = "#12be16";
+    }
+    function alter2() {
+        //手机号
+        example1.isEditingTel=true;
+
+        document.getElementById('pp2').focus();
+        document.getElementById("sure").style.backgroundColor = "#12be16";
+    }
+
+    layui.use('layer', function () { //独立版的layer无需执行这一句
+        var $ = layui.jquery, layer = layui.layer; //独立版的layer无需执行这一句
+
+        //触发事件
+        var active = {
+            offset: function (othis) {
+                var type = othis.data('type');
+
+                layer.open({
+                    type: 1
+                    , offset: type //具体配置参考：http://www.layui.com/doc/modules/layer.html#offset
+                    , id: 'layerDemo' + type //防止重复弹出
+                    , content: '<div style="padding: 20px 100px;">' + example1.tip + '</div>'
+                    , btn: '确定'
+                    , btnAlign: 'c' //按钮居中
+                    , shade: 0 //不显示遮罩
+                    , yes: function () {
+                        layer.closeAll();
+                    }
+                });
+            }
+        };
+
+
+        $('#layerDemo .personSure').on('click', function () {
+            var usenumber = document.getElementById("pp2").value;
+            var snum = /^1[0-9]{10}$/;
+            if (!snum.test(usenumber)) {
+                document.getElementById("pp2").style.color = "red";
+                example1.tip = '手机号码不符合规范!';
+                var othis = $(this), method = "offset";
+                active[method] ? active[method].call(this, othis) : '';
+                return false;
+            } else {
+                document.getElementById("pp2").style.color = "#666";
+            }
+            console.log("注意")
+            console.log(example1.user)
+            axios.post('/api/user/modify', example1.user)
+                .then((response) => {
+                    console.log(response);
+                    if (response.data == true) {
+                        example1.tip = '个人信息修改成功!';
+                        example1.username1 = example1.user.username;
+                        example1.delCookie('username');
+                        example1.setCookie('username', example1.user.username);
+                        example1.isEditingName=false;
+                        example1.isEditingTel=false;
+                    } else {
+                        example1.tip = '系统错误，请稍后再试!';
+                    }
+                    var othis = $(this), method = "offset";
+                    active[method] ? active[method].call(this, othis) : '';
+                })
+                .catch((error) => {
+                    console.log(error);
+                    example1.tip = '系统错误，请稍后再试!';
+                    var othis = $(this), method = "offset";
+                    active[method] ? active[method].call(this, othis) : '';
+                });
+        });
+    });
+</script>
+</body>
+
+</html>

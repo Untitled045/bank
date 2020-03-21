@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<title>17充值提现-提现</title>
+		<link rel="stylesheet" type="text/css" href="css/reset.css" />
+		<link rel="stylesheet" type="text/css" href="css/style.css" />
+		
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script type="text/javascript" src="js/jquery.nicescroll.min.js"></script>
+		<script type="text/javascript" src="js/index.js"></script>
+        <link rel="stylesheet" href="js/layui/css/layui.css">
+        <script src="js/layui/layui.js"></script>
+		<script type="text/javascript" src="js/vue.js"></script>
+		<script type="text/javascript" src="js/axios.min.js"></script>
+	</head>
+	<body>
+	<div id="container">
+		<!--Top Start!-->
+		<div id="top">
+			<div class="topBar">
+				<div class="inner clearfix">
+					<h4>存取款/转账</h4>
+					<div class="contact topItem">
+						<h3><a href="#">联系我们<i></i></a></h3>
+						<div class="dropdown">
+							<a href="#">联系我们</a>
+							<a href="#">联系我们</a>
+							<a href="#">联系我们</a>
+						</div>
+					</div>
+                    <div class="userBar topItem">
+                        <h3><a href="#">{{username}}<i></i></a></h3>
+                        <div class="dropdown">
+                            <a @click="logout()">退出</a>
+                        </div>
+                    </div>
+				</div>
+			</div>
+		</div>
+		<!--Top End!-->
+	
+		<!--Main Start!-->
+		<div id="main">
+			<div class="content">
+				<div class="contBox bgf9">
+					<div class="moneyBox moneyBox1" style="margin-bottom: 100px;">
+						<div class="moneyTit">
+							<ul>
+								<li><a href="16money.html" target="_self">存款</a></li>
+								<li class="active"><a href="17money_deposit.html" target="_self">取款</a></li>
+								<li><a href="18money_transition.html" target="_self">转出</a></li>
+							</ul>
+						</div>
+						<h3><span>取出金额：</span><input v-model="amount" type="text" name="" id="money" value="" /><span>元</span></h3>
+                        <div class="site-demo-button" id="layerDemo" style="margin-bottom: 0;">
+                            <a class="cz" data-method="offset" data-type="auto">确认取出</a>
+                        </div>
+						<div class="moneyW">
+							<h4>提现说明</h4>
+							<p>1、提现余额低于100元无法提现；</p>
+							<p>2、提现金额不能大于提现金额；</p>
+							<p>3、提现申请后，请耐心等待管理员审核；</p>
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</div>
+		<!--Main End!-->
+	</div>
+
+		<script>
+			var example1 = new Vue({
+				el: '#container',
+				data: {
+					username:'',
+					amount:"",
+					tip:''
+				},
+				methods:{
+					logout(){
+						this.delCookie('card');
+						this.delCookie('username');
+						window.top.location="/api/user/logout";
+					},
+//读取cookies
+					getCookie(name){
+						var arr,reg=new RegExp("(^| )"+name+"=([^;]*)(;|$)");
+
+						if(arr=document.cookie.match(reg))
+
+							return unescape(arr[2]);
+						else
+							return null;
+					},
+
+					//删除cookies
+					delCookie(name)
+					{
+						var exp = new Date();
+						exp.setTime(exp.getTime() - 1);
+						var cval=this.getCookie(name);
+						if(cval!=null)
+							document.cookie= name + "="+cval+";expires="+exp.toGMTString();
+					}
+
+				},
+				mounted(){
+					this.username=this.getCookie("username")
+				}
+			});
+			layui.use('layer', function(){ //独立版的layer无需执行这一句
+				var $ = layui.jquery, layer = layui.layer; //独立版的layer无需执行这一句
+
+				//触发事件
+				var active = {
+					offset: function(othis){
+						var type = othis.data('type');
+
+						layer.open({
+							type: 1
+							,offset: type //具体配置参考：http://www.layui.com/doc/modules/layer.html#offset
+							,id: 'layerDemo'+type //防止重复弹出
+							,content: '<div style="padding: 20px 100px;">'+ example1.tip +'</div>'
+							,btn: '确定'
+							,btnAlign: 'c' //按钮居中
+							,shade: 0 //不显示遮罩
+							,yes: function(){
+								layer.closeAll();
+							}
+						});
+					}
+				};
+
+
+				$('#layerDemo .cz').on('click', function(){
+					axios.post('/api/account/transfer', {
+						type:1,
+						amount:example1.amount,
+						oppositecard :"",
+						card:example1.getCookie("card")
+					})
+							.then((response)=> {
+								console.log(response);
+								if(response.data==true){
+									example1.tip='取款成功!';
+								}else{
+									example1.tip='余额不足, 取款失败!';
+								}
+								var othis = $(this), method = "offset";
+								active[method] ? active[method].call(this, othis) : '';
+							})
+							.catch((error)=> {
+								console.log(error);
+								example1.tip='系统错误，请稍后再试!';
+								var othis = $(this), method = "offset";
+								active[method] ? active[method].call(this, othis) : '';
+							});
+
+				});
+
+			});
+		</script>
+	</body>
+</html>
